@@ -1,4 +1,3 @@
-import React from 'react'
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts'
 import { IndianRupee, Layers, AlertCircle } from 'lucide-react'
 import { useInspection } from '../store/inspectionStore'

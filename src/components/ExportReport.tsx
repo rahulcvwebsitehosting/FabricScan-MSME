@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Download, Loader2 } from 'lucide-react'
 import { useInspection } from '../store/inspectionStore'
 import html2canvas from 'html2canvas'
@@ -58,7 +58,7 @@ export function ExportReport() {
           <tbody>
       `
 
-      state.results.forEach((r, idx) => {
+      state.results.forEach((r) => {
         html += `
           <tr style="border-bottom: 1px solid #e5e7eb;">
             <td style="padding: 12px; font-weight: 600;">${r.imageName}</td>

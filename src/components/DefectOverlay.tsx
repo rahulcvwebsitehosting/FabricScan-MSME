@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react'
+import { useRef, useState } from 'react'
 import type { Defect, BoundingBox } from '../types'
 import { BBOX_CONFIDENCE_THRESHOLD } from '../types'
 import { AlertTriangle } from 'lucide-react'
@@ -140,7 +140,7 @@ function DefectTooltip({
 }: {
   defect: Defect
   pos: { x: number; y: number }
-  containerRef: React.RefObject<HTMLDivElement>
+  containerRef: React.RefObject<HTMLDivElement | null>
 }) {
   const rect = containerRef.current?.getBoundingClientRect()
   if (!rect) return null

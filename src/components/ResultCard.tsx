@@ -1,4 +1,3 @@
-import React from 'react'
 import { CheckCircle, AlertTriangle, XCircle, ChevronRight, IndianRupee } from 'lucide-react'
 import type { InspectionResult } from '../types'
 import { DefectOverlay } from './DefectOverlay'

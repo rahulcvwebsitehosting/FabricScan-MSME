@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Header } from './components/Header'
 import { UploadZone } from './components/UploadZone'
 import { ResultModal } from './components/ResultModal'
 import { BatchDashboard } from './components/BatchDashboard'
 import { ExportReport } from './components/ExportReport'
 import { InspectionProvider, useInspection } from './store/inspectionStore'
-import { AlertCircle, CheckCircle } from 'lucide-react'
+import { AlertCircle } from 'lucide-react'
 
 function AppContent() {
   const { state, clearError } = useInspection()

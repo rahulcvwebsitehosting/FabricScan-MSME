@@ -1,4 +1,3 @@
-import React from 'react'
 import { Scan, ShieldCheck } from 'lucide-react'
 import { useInspection } from '../store/inspectionStore'
 
