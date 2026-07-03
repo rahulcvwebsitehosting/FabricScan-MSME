@@ -38,7 +38,16 @@ export interface Defect {
   confidence: number
   /** null when confidence < BBOX_CONFIDENCE_THRESHOLD or location is ambiguous */
   boundingBox: BoundingBox | null
+  /** Detailed multi-sentence description of the defect, its visual appearance and location */
   description: string
+  /** Precise physical location on the garment. e.g. "Left shoulder, 3cm from collar seam" */
+  location: string
+  /** Why this is a defect — standard violated, expected quality, process failure */
+  why: string
+  /** Consequence if not fixed — customer complaints, structural weakness, brand damage */
+  impact: string
+  /** Specific actionable steps a factory worker can follow to repair this defect */
+  reworkInstructions: string
   estimatedCostINR: { min: number; max: number }
   recommendation: Recommendation
 }

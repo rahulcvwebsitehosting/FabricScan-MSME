@@ -1,4 +1,5 @@
-import React, { useEffect, useCallback } from 'react'
+import { useEffect, useCallback } from 'react'
+import type { ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -9,7 +10,7 @@ import type { Defect, DefectType, InspectionResult } from '../types'
 import { DefectOverlay } from './DefectOverlay'
 import { useInspection } from '../store/inspectionStore'
 
-const DEFECT_ICONS: Record<DefectType, React.ReactNode> = {
+const DEFECT_ICONS: Record<DefectType, ReactNode> = {
   tear:               <Scissors size={15} />,
   loose_thread:       <Layers size={15} />,
   stain:              <Droplets size={15} />,
@@ -176,6 +177,38 @@ function DefectDetailCard({ defect, index }: { defect: Defect; index: number }) 
       <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12, lineHeight: 1.5 }}>
         {defect.description}
       </p>
+
+      {/* Location */}
+      {defect.location && (
+        <div style={{ marginBottom: 10, padding: '8px 10px', background: 'var(--bg-elevated)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
+          <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>Location</div>
+          <div style={{ fontSize: 12, color: 'var(--text)' }}>{defect.location}</div>
+        </div>
+      )}
+
+      {/* Why */}
+      {defect.why && (
+        <div style={{ marginBottom: 10, padding: '8px 10px', background: 'var(--bg-elevated)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
+          <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>Why this is a defect</div>
+          <div style={{ fontSize: 12, color: 'var(--text)' }}>{defect.why}</div>
+        </div>
+      )}
+
+      {/* Impact */}
+      {defect.impact && (
+        <div style={{ marginBottom: 10, padding: '8px 10px', background: 'var(--bg-elevated)', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(224,50,74,0.15)' }}>
+          <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--reject)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>Impact if not fixed</div>
+          <div style={{ fontSize: 12, color: 'var(--text)' }}>{defect.impact}</div>
+        </div>
+      )}
+
+      {/* Rework Instructions */}
+      {defect.reworkInstructions && (
+        <div style={{ marginBottom: 10, padding: '8px 10px', background: 'var(--bg-elevated)', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(52,211,153,0.15)' }}>
+          <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--ok)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>How to fix</div>
+          <div style={{ fontSize: 12, color: 'var(--text)' }}>{defect.reworkInstructions}</div>
+        </div>
+      )}
 
       {/* Metrics */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 10 }}>
