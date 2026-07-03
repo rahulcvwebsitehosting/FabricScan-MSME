@@ -9,12 +9,14 @@ interface DefectOverlayProps {
   interactive?: boolean  // show hover tooltips
 }
 
+// Severity → colour. Values only — do not touch the geometry math below,
+// it's calibrated against Gemini's percentage-based bounding boxes.
 const SEVERITY_COLORS: Record<string, string> = {
-  none:     '#22c55e',
-  minor:    '#f59e0b',
+  none:     '#34d399',
+  minor:    '#f0a020',
   moderate: '#fb923c',
-  major:    '#ef4444',
-  reject:   '#dc2626',
+  major:    '#f0596b',
+  reject:   '#e0324a',
 }
 
 /**
@@ -67,10 +69,32 @@ export function DefectOverlay({ imageUrl, defects, interactive = true }: DefectO
           >
             {boxDefects.map((defect, idx) => {
               const bb  = defect.boundingBox as BoundingBox
-              const col = SEVERITY_COLORS[defect.severity] ?? '#f59e0b'
+              const col = SEVERITY_COLORS[defect.severity] ?? '#f0a020'
 
               return (
                 <g key={idx}>
+                  {/* Targeting pulse — machine-vision "lock-on" cue, geometry identical to the box below */}
+                  <rect
+                    x={bb.x} y={bb.y * (imgDims.h / imgDims.w)}
+                    width={bb.width} height={bb.height * (imgDims.h / imgDims.w)}
+                    fill="none"
+                    stroke={col}
+                    strokeWidth="0.6"
+                    rx="0.5"
+                    opacity="0.5"
+                    style={{ pointerEvents: 'none' }}
+                  >
+                    <animate attributeName="opacity" values="0.5;0;0.5" dur="2.4s" repeatCount="indefinite" begin={`${idx * 0.3}s`} />
+                    <animateTransform
+                      attributeName="transform"
+                      type="scale"
+                      values="1;1.06;1"
+                      additive="sum"
+                      dur="2.4s"
+                      repeatCount="indefinite"
+                      begin={`${idx * 0.3}s`}
+                    />
+                  </rect>
                   <rect
                     x={bb.x} y={bb.y * (imgDims.h / imgDims.w)}
                     width={bb.width} height={bb.height * (imgDims.h / imgDims.w)}
@@ -114,9 +138,10 @@ export function DefectOverlay({ imageUrl, defects, interactive = true }: DefectO
                 display: 'flex', alignItems: 'center', gap: 8,
                 padding: '8px 12px',
                 background: 'var(--warn-dim)',
-                border: '1px solid rgba(245,158,11,0.2)',
+                border: '1px solid rgba(240,160,32,0.25)',
                 borderRadius: 'var(--radius-sm)',
                 fontSize: 13,
+                backdropFilter: 'blur(8px)',
               }}
             >
               <AlertTriangle size={14} color="var(--warn)" style={{ flexShrink: 0 }} />
@@ -149,15 +174,12 @@ function DefectTooltip({
   const top  = Math.max(pos.y - rect.top  - 80, 8)
 
   return (
-    <div style={{
+    <div className="glass-deep" style={{
       position: 'absolute', left, top,
-      background: 'var(--bg-elevated)',
-      border: '1px solid var(--border)',
       borderRadius: 'var(--radius)',
       padding: '10px 14px',
       pointerEvents: 'none',
       width: 210,
-      boxShadow: 'var(--shadow-lg)',
       zIndex: 10,
     }}>
       <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 6 }}>{defect.label}</div>

@@ -1,5 +1,6 @@
 import React, { useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   X, CheckCircle, AlertTriangle, XCircle,
   IndianRupee, Scissors, Layers, Droplets, AlignLeft, Printer, Palette,
@@ -31,96 +32,112 @@ export function ResultModal() {
     return () => document.removeEventListener('keydown', handler)
   }, [close])
 
-  if (!result) return null
-
   return createPortal(
-    <div className="modal-backdrop" onClick={e => { if (e.target === e.currentTarget) close() }}>
-      <div className="modal">
-        {/* Header */}
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '20px 24px',
-          borderBottom: '1px solid var(--border)',
-          flexShrink: 0,
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <StatusBadge result={result} />
-            <span style={{ fontWeight: 600, fontSize: 15, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 400 }}>
-              {result.imageName}
-            </span>
-          </div>
-          <button
-            onClick={close}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 4 }}
-            title="Close (Esc)"
+    <AnimatePresence>
+      {result && (
+        <motion.div
+          className="modal-backdrop"
+          onClick={e => { if (e.target === e.currentTarget) close() }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18 }}
+          style={{ animation: 'none' }}
+        >
+          <motion.div
+            className="modal"
+            initial={{ opacity: 0, y: 24, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 12, scale: 0.98 }}
+            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            style={{ animation: 'none' }}
           >
-            <X size={20} />
-          </button>
-        </div>
-
-        {/* Body */}
-        <div style={{ display: 'flex', overflow: 'hidden', flex: 1 }}>
-
-          {/* Left — image */}
-          <div style={{
-            flex: '0 0 55%',
-            borderRight: '1px solid var(--border)',
-            padding: 24,
-            overflowY: 'auto',
-            background: 'var(--bg)',
-          }}>
-            <DefectOverlay imageUrl={result.imageUrl} defects={result.defects} interactive />
-
-            {/* Summary strip */}
+            {/* Header */}
             <div style={{
-              marginTop: 16, display: 'flex', gap: 12,
-              padding: '12px 16px',
-              background: 'var(--surface)',
-              borderRadius: 'var(--radius)',
-              border: '1px solid var(--border)',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '20px 24px',
+              borderBottom: '1px solid var(--border-glass)',
+              flexShrink: 0,
             }}>
-              <SummaryStat label="Defects" value={result.defects.length} />
-              <SummaryStat label="Severity" value={result.overallSeverity} />
-              <SummaryStat
-                label="Est. cost"
-                value={result.totalEstimatedCost.max > 0
-                  ? `₹${result.totalEstimatedCost.min}–${result.totalEstimatedCost.max}`
-                  : '₹0'}
-              />
-              <SummaryStat label="Processed in" value={`${(result.processingTimeMs / 1000).toFixed(1)}s`} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <StatusBadge result={result} />
+                <span className="font-display" style={{ fontWeight: 600, fontSize: 15, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 400 }}>
+                  {result.imageName}
+                </span>
+              </div>
+              <button
+                onClick={close}
+                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border-glass)', borderRadius: 8, cursor: 'pointer', color: 'var(--text-muted)', padding: 6, display: 'flex' }}
+                title="Close (Esc)"
+              >
+                <X size={18} />
+              </button>
             </div>
-          </div>
 
-          {/* Right — defect details */}
-          <div style={{ flex: 1, padding: 24, overflowY: 'auto' }}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Defect Report
-            </h3>
+            {/* Body */}
+            <div className="modal-body" style={{ display: 'flex', overflow: 'hidden', flex: 1 }}>
 
-            {result.defects.length === 0 ? (
-              <div style={{
-                padding: 32, textAlign: 'center',
-                background: 'var(--ok-dim)', borderRadius: 'var(--radius)',
-                border: '1px solid rgba(34,197,94,0.2)',
+              {/* Left — image */}
+              <div className="modal-panel-media" style={{
+                flex: '0 0 55%',
+                borderRight: '1px solid var(--border-glass)',
+                padding: 24,
+                overflowY: 'auto',
+                background: 'radial-gradient(ellipse 600px 400px at 20% 0%, rgba(58,214,240,0.05), transparent 60%)',
               }}>
-                <CheckCircle size={32} color="var(--ok)" style={{ marginBottom: 12 }} />
-                <div style={{ fontWeight: 600, color: 'var(--ok)', marginBottom: 4 }}>No defects detected</div>
-                <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>This item passes quality inspection</div>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {result.defects.map((defect, i) => (
-                  <DefectDetailCard key={i} defect={defect} index={i + 1} />
-                ))}
-              </div>
-            )}
+                <DefectOverlay imageUrl={result.imageUrl} defects={result.defects} interactive />
 
-            {/* Recommendation */}
-            <RecommendationBlock result={result} />
-          </div>
-        </div>
-      </div>
-    </div>,
+                {/* Summary strip */}
+                <div className="glass modal-summary-strip" style={{
+                  marginTop: 16, display: 'flex', gap: 12, flexWrap: 'wrap',
+                  padding: '12px 16px',
+                  borderRadius: 'var(--radius)',
+                }}>
+                  <SummaryStat label="Defects" value={result.defects.length} />
+                  <SummaryStat label="Severity" value={result.overallSeverity} />
+                  <SummaryStat
+                    label="Est. cost"
+                    value={result.totalEstimatedCost.max > 0
+                      ? `₹${result.totalEstimatedCost.min}–${result.totalEstimatedCost.max}`
+                      : '₹0'}
+                  />
+                  <SummaryStat label="Processed in" value={`${(result.processingTimeMs / 1000).toFixed(1)}s`} />
+                </div>
+              </div>
+
+              {/* Right — defect details */}
+              <div className="modal-panel-details" style={{ flex: 1, padding: 24, overflowY: 'auto' }}>
+                <h3 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  Defect Report
+                </h3>
+
+                {result.defects.length === 0 ? (
+                  <div style={{
+                    padding: 32, textAlign: 'center',
+                    background: 'var(--ok-dim)', borderRadius: 'var(--radius)',
+                    border: '1px solid rgba(52,211,153,0.25)',
+                    backdropFilter: 'blur(12px)',
+                  }}>
+                    <CheckCircle size={32} color="var(--ok)" style={{ marginBottom: 12 }} />
+                    <div style={{ fontWeight: 600, color: 'var(--ok)', marginBottom: 4 }}>No defects detected</div>
+                    <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>This item passes quality inspection</div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {result.defects.map((defect, i) => (
+                      <DefectDetailCard key={i} defect={defect} index={i + 1} />
+                    ))}
+                  </div>
+                )}
+
+                {/* Recommendation */}
+                <RecommendationBlock result={result} />
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>,
     document.body,
   )
 }
@@ -130,17 +147,19 @@ function DefectDetailCard({ defect, index }: { defect: Defect; index: number }) 
   const severityColor = { none: 'var(--ok)', minor: 'var(--ok)', moderate: '#fb923c', major: 'var(--danger)', reject: 'var(--reject)' }[defect.severity]
 
   return (
-    <div style={{
-      background: 'var(--surface)',
-      border: '1px solid var(--border)',
-      borderRadius: 'var(--radius)',
-      padding: '14px 16px',
-    }}>
+    <motion.div
+      initial={{ opacity: 0, x: 10 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.25, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] }}
+      className="card-sm"
+      style={{ padding: '14px 16px' }}
+    >
       {/* Title row */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
         <div style={{
-          width: 26, height: 26, borderRadius: 6,
+          width: 26, height: 26, borderRadius: 7,
           background: 'var(--bg-elevated)',
+          border: '1px solid var(--border-glass)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           color: 'var(--accent)', flexShrink: 0,
         }}>
@@ -163,7 +182,12 @@ function DefectDetailCard({ defect, index }: { defect: Defect; index: number }) 
         <MetricRow label="Confidence">
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <div style={{ flex: 1, height: 4, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
-              <div style={{ width: `${defect.confidence * 100}%`, height: '100%', background: 'var(--accent)', borderRadius: 2 }} />
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${defect.confidence * 100}%` }}
+                transition={{ duration: 0.6, delay: 0.15 + index * 0.05, ease: [0.16, 1, 0.3, 1] }}
+                style={{ height: '100%', background: 'linear-gradient(90deg, var(--scan), var(--accent))', borderRadius: 2 }}
+              />
             </div>
             <span style={{ fontSize: 12, fontWeight: 600, width: 32, textAlign: 'right' }}>
               {Math.round(defect.confidence * 100)}%
@@ -173,7 +197,12 @@ function DefectDetailCard({ defect, index }: { defect: Defect; index: number }) 
         <MetricRow label="Severity level">
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <div style={{ flex: 1, height: 4, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
-              <div style={{ width: severityWidth, height: '100%', background: severityColor, borderRadius: 2 }} />
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: severityWidth }}
+                transition={{ duration: 0.6, delay: 0.15 + index * 0.05, ease: [0.16, 1, 0.3, 1] }}
+                style={{ height: '100%', background: severityColor, borderRadius: 2 }}
+              />
             </div>
           </div>
         </MetricRow>
@@ -184,6 +213,7 @@ function DefectDetailCard({ defect, index }: { defect: Defect; index: number }) 
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         padding: '10px 12px',
         background: 'var(--bg-elevated)',
+        border: '1px solid var(--border-subtle)',
         borderRadius: 'var(--radius-sm)',
         fontSize: 13,
       }}>
@@ -194,7 +224,7 @@ function DefectDetailCard({ defect, index }: { defect: Defect; index: number }) 
         </div>
         <RecommendationChip rec={defect.recommendation} />
       </div>
-    </div>
+    </motion.div>
   )
 }
 
@@ -224,7 +254,7 @@ function MetricRow({ label, children }: { label: string; children: React.ReactNo
 function SummaryStat({ label, value }: { label: string; value: string | number }) {
   return (
     <div style={{ textAlign: 'center', flex: 1 }}>
-      <div style={{ fontWeight: 600, fontSize: 15 }}>{value}</div>
+      <div className="font-display" style={{ fontWeight: 600, fontSize: 16 }}>{value}</div>
       <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{label}</div>
     </div>
   )
@@ -243,19 +273,19 @@ function StatusBadge({ result }: { result: InspectionResult }) {
 function RecommendationBlock({ result }: { result: InspectionResult }) {
   const map = {
     pass: {
-      bg: 'var(--ok-dim)', border: 'rgba(34,197,94,0.2)', color: 'var(--ok)',
+      bg: 'var(--ok-dim)', border: 'rgba(52,211,153,0.25)', color: 'var(--ok)',
       icon: <CheckCircle size={20} />,
       title: 'Pass — No action required',
       body: 'This garment meets quality standards and is ready for shipment.',
     },
     rework: {
-      bg: 'var(--warn-dim)', border: 'rgba(245,158,11,0.2)', color: 'var(--warn)',
+      bg: 'var(--warn-dim)', border: 'rgba(240,160,32,0.25)', color: 'var(--warn)',
       icon: <AlertTriangle size={20} />,
       title: 'Rework required before shipment',
       body: `Estimated rework cost: ₹${result.totalEstimatedCost.min}–${result.totalEstimatedCost.max}. Address the flagged defects before passing this item.`,
     },
     reject: {
-      bg: 'var(--reject-dim)', border: 'rgba(220,38,38,0.2)', color: 'var(--reject)',
+      bg: 'var(--reject-dim)', border: 'rgba(224,50,74,0.25)', color: 'var(--reject)',
       icon: <XCircle size={20} />,
       title: 'Reject — Do not ship',
       body: `Defect severity exceeds rework threshold. Estimated waste cost: ₹${result.totalEstimatedCost.min}–${result.totalEstimatedCost.max}.`,
@@ -269,6 +299,7 @@ function RecommendationBlock({ result }: { result: InspectionResult }) {
       background: map.bg,
       border: `1px solid ${map.border}`,
       borderRadius: 'var(--radius)',
+      backdropFilter: 'blur(12px)',
       display: 'flex', gap: 12, alignItems: 'flex-start',
     }}>
       <div style={{ color: map.color, flexShrink: 0, marginTop: 2 }}>{map.icon}</div>

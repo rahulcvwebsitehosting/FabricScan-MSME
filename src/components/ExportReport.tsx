@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 import { Download, Loader2 } from 'lucide-react'
 import { useInspection } from '../store/inspectionStore'
 import html2canvas from 'html2canvas'
@@ -113,15 +114,17 @@ export function ExportReport() {
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', marginTop: 40, paddingBottom: 60 }}>
-      <button 
-        className="btn btn-primary btn-lg" 
+      <motion.button
+        className="btn btn-primary btn-lg"
         onClick={handleExport}
         disabled={isExporting}
+        whileHover={{ scale: 1.015 }}
+        whileTap={{ scale: 0.985 }}
         style={{ width: '100%', maxWidth: 300, justifyContent: 'center' }}
       >
         {isExporting ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
         {isExporting ? 'Generating PDF...' : 'Export PDF Report'}
-      </button>
+      </motion.button>
     </div>
   )
 }

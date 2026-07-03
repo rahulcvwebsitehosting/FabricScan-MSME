@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/jetbrains-mono": "^5.2.8",
+    "@fontsource/space-grotesk": "^5.2.10",
     "@google/generative-ai": "^0.24.1",
     "@types/uuid": "^10.0.0",
     "@vercel/node": "^5.8.22",
