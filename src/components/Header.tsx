@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion'
-import { Scan, ShieldCheck } from 'lucide-react'
+import { Scan, ShieldCheck, Cpu } from 'lucide-react'
 import { useInspection } from '../store/inspectionStore'
 
 export function Header() {
   const { state, batchStats, clearSession } = useInspection()
-  const { results } = state
+  const { results, activeProvider } = state
 
   return (
     <header
@@ -98,6 +98,31 @@ export function Header() {
             <ShieldCheck size={13} />
             <span className="header-stat-optional">Secure</span>
           </div>
+
+          {/* Active AI provider badge */}
+          {activeProvider && (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              background: activeProvider === 'Ollama Cloud'
+                ? 'var(--warn-dim)'
+                : 'var(--accent-dim)',
+              border: activeProvider === 'Ollama Cloud'
+                ? '1px solid rgba(240,160,32,0.25)'
+                : '1px solid rgba(44,160,240,0.25)',
+              borderRadius: 999,
+              padding: '6px 13px',
+              fontSize: 12,
+              color: activeProvider === 'Ollama Cloud'
+                ? 'var(--warn)'
+                : 'var(--accent)',
+              fontWeight: 500,
+              backdropFilter: 'blur(8px)',
+              flexShrink: 0,
+            }}>
+              <Cpu size={13} />
+              <span className="header-stat-optional">{activeProvider}</span>
+            </div>
+          )}
         </div>
       </div>
     </header>

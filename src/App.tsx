@@ -5,19 +5,27 @@ import { ResultModal } from './components/ResultModal'
 import { BatchDashboard } from './components/BatchDashboard'
 import { ExportReport } from './components/ExportReport'
 import { InspectionProvider, useInspection } from './store/inspectionStore'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle, RefreshCw } from 'lucide-react'
 
 function AppContent() {
-  const { state, clearError } = useInspection()
-  const { error } = state
+  const { state, clearError, clearFailoverNotice } = useInspection()
+  const { error, failoverNotice } = state
   
-  // Auto-clear toast after 5s
+  // Auto-clear error toast after 5s
   useEffect(() => {
     if (error) {
       const timer = setTimeout(clearError, 5000)
       return () => clearTimeout(timer)
     }
   }, [error, clearError])
+
+  // Auto-clear failover notice after 6s
+  useEffect(() => {
+    if (failoverNotice) {
+      const timer = setTimeout(clearFailoverNotice, 6000)
+      return () => clearTimeout(timer)
+    }
+  }, [failoverNotice, clearFailoverNotice])
 
   return (
     <>
@@ -36,10 +44,19 @@ function AppContent() {
       <div className="toast-container">
         {error && (
           <div className="toast toast-error">
-            <AlertCircle size={18} color="var(--danger)" />
+            <AlertCircle size={18} color="var(--reject)" />
             <div>
-              <div style={{ fontWeight: 600, color: 'var(--danger)', marginBottom: 2 }}>Error</div>
+              <div style={{ fontWeight: 600, color: 'var(--reject)', marginBottom: 2 }}>Error</div>
               <div style={{ color: 'var(--text-muted)' }}>{error}</div>
+            </div>
+          </div>
+        )}
+        {failoverNotice && (
+          <div className="toast toast-warn">
+            <RefreshCw size={18} color="var(--scan)" />
+            <div>
+              <div style={{ fontWeight: 600, color: 'var(--scan)', marginBottom: 2 }}>Provider Switched</div>
+              <div style={{ color: 'var(--text-muted)' }}>{failoverNotice}</div>
             </div>
           </div>
         )}

@@ -70,7 +70,9 @@ export async function analyzeImage(
   }
 
   const raw = await response.json()
-  const processingTimeMs = Date.now() - startTime
+  // The API now returns providerUsed and failoverOccurred top-level:
+  // { ...defectsJson, providerUsed, failoverOccurred, processingTimeMs }
+  const processingTimeMs = raw.processingTimeMs ?? (Date.now() - startTime)
 
   return parseRawResponse(raw, imageName, imageUrl, processingTimeMs)
 }
@@ -105,6 +107,8 @@ function parseRawResponse(
     overallSeverity: (raw.overallSeverity as InspectionResult['overallSeverity']) ?? 'none',
     totalEstimatedCost: totalCost,
     processingTimeMs,
+    providerName:     (raw.providerUsed     as string | undefined),
+    failoverOccurred: (raw.failoverOccurred as boolean | undefined),
   }
 }
 

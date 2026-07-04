@@ -63,6 +63,10 @@ export interface InspectionResult {
   overallSeverity: Severity
   totalEstimatedCost: { min: number; max: number }
   processingTimeMs: number
+  /** The AI provider that generated this result (e.g. "Gemini Vision", "Ollama Cloud") */
+  providerName?: string
+  /** True when the primary provider failed and a fallback provider was used */
+  failoverOccurred?: boolean
 }
 
 export interface BatchStats {
@@ -87,6 +91,8 @@ export interface ApiError {
     | 'model_unavailable'
     | 'method_not_allowed'
     | 'timeout'
+    | 'quota_exhausted'
+    | 'network_error'
   message: string
 }
 
