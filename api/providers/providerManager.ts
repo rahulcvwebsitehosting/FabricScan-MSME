@@ -1,5 +1,5 @@
 import type { AIProvider, ProviderResult } from './types'
-import { shouldFailover } from './types'
+import { ProviderError, shouldFailover } from './types'
 import { geminiProvider } from './gemini'
 import { ollamaProvider } from './ollama'
 
