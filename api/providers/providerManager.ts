@@ -39,6 +39,8 @@ export async function analyzeWithFallback(imageBase64: string): Promise<Provider
 
       errors.push(`${provider.name}: ${err instanceof Error ? err.message : String(err)}`)
 
+      console.error(`[providerManager] ${provider.name} failed:`, err)
+
       if (shouldTryNext) {
         failoverOccurred = true
         continue // try next provider

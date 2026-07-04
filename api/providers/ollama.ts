@@ -61,7 +61,7 @@ export const ollamaProvider: AIProvider = {
     if (!response.ok) {
       let errBody = ''
       try { errBody = await response.text() } catch {}
-      throw new Error(`${response.status} ${response.statusText} - ${errBody.slice(0, 300)}`)
+      throw classifyOllamaError(new Error(`${response.status} ${response.statusText} - ${errBody.slice(0, 300)}`))
     }
 
     const data = await response.json() as {

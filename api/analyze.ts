@@ -25,6 +25,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const code = (err instanceof ProviderError ? err.code : null) ?? 'analysis_failed'
     const msg  = err instanceof Error ? err.message : 'Analysis failed. Try again.'
 
+    // Log the raw error so Vercel function logs show what actually failed
+    console.error('[analyze] provider chain failed:', err)
+
     // Map provider error codes to API error codes the frontend understands
     const apiErrorCode = code === 'quota_exhausted' || code === 'rate_limited'
       ? 'quota_exhausted'
