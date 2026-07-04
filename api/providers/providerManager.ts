@@ -1,7 +1,7 @@
-import type { AIProvider, ProviderResult } from './types'
-import { ProviderError, shouldFailover } from './types'
-import { geminiProvider } from './gemini'
-import { ollamaProvider } from './ollama'
+import type { AIProvider, ProviderResult } from './types.js'
+import { ProviderError, shouldFailover } from './types.js'
+import { geminiProvider } from './gemini.js'
+import { ollamaProvider } from './ollama.js'
 
 /**
  * Ordered list of providers. First is primary, subsequent are fallbacks.

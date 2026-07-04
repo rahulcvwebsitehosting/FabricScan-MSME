@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
-import type { RawAnalysis, AIProvider } from './types'
-import { ProviderError } from './types'
-import { FABRIC_INSPECTION_PROMPT } from './prompt'
+import type { RawAnalysis, AIProvider } from './types.js'
+import { ProviderError } from './types.js'
+import { FABRIC_INSPECTION_PROMPT } from './prompt.js'
 
 // Pinned model versions — never use '-latest' aliases.
 const MODEL_PRIMARY  = 'gemini-2.5-flash'

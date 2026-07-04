@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { analyzeWithFallback } from './providers/providerManager'
-import { ProviderError } from './providers/types'
+import { analyzeWithFallback } from './providers/providerManager.js'
+import { ProviderError } from './providers/types.js'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -22,7 +22,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     })
   } catch (err: unknown) {
     // ProviderError from providerManager has .code and .message
-    const code = (err instanceof ProviderError ? err.code : null) ?? 'analysis_failed'
+    const code = (err instanceof ProviderError ? (err as ProviderError).code : null) ?? 'analysis_failed'
     const msg  = err instanceof Error ? err.message : 'Analysis failed. Try again.'
 
     // Log the raw error so Vercel function logs show what actually failed

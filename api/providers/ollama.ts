@@ -1,6 +1,6 @@
-import type { RawAnalysis, AIProvider } from './types'
-import { ProviderError } from './types'
-import { FABRIC_INSPECTION_PROMPT } from './prompt'
+import type { RawAnalysis, AIProvider } from './types.js'
+import { ProviderError } from './types.js'
+import { FABRIC_INSPECTION_PROMPT } from './prompt.js'
 
 const BASE_URL  = (process.env.OLLAMA_BASE_URL  ?? 'https://api.ollama.com/v1').replace(/\/+$/, '')
 const API_KEY   = process.env.OLLAMA_API_KEY
