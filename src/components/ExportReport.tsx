@@ -244,21 +244,21 @@ async function generateDetailedPDF(results: InspectionResult[], batchStats: Batc
         pdf.setFontSize(8)
         pdf.setTextColor(...C_MUTED)
         pdf.text('Confidence', tx, itemY)
-        pdf.text('Severity', tx + 60, itemY)
-        pdf.text('Est. Cost', tx + 110, itemY)
-        pdf.text('Action', tx + 155, itemY)
+        pdf.text('Severity', tx + 48, itemY)
+        pdf.text('Est. Cost', tx + 95, itemY)
+        pdf.text('Action', tx + 138, itemY)
         itemY += 4
 
         pdf.setFont('helvetica', 'bold')
         pdf.setFontSize(9)
         pdf.setTextColor(...C_TEXT)
         pdf.text(`${Math.round(d.confidence * 100)}%`, tx, itemY)
-        pdf.text(d.severity.toUpperCase(), tx + 60, itemY)
+        pdf.text(d.severity.toUpperCase(), tx + 48, itemY)
         pdf.setTextColor(...C_WARN)
-        pdf.text(`₹${d.estimatedCostINR.min}–${d.estimatedCostINR.max}`, tx + 110, itemY)
+        pdf.text(`₹${d.estimatedCostINR.min}–${d.estimatedCostINR.max}`, tx + 95, itemY)
         const actC = d.recommendation === 'pass' ? C_OK : d.recommendation === 'rework' ? C_WARN : C_REJECT
         pdf.setTextColor(...actC)
-        pdf.text(d.recommendation.toUpperCase(), tx + 155, itemY)
+        pdf.text(d.recommendation.toUpperCase(), tx + 138, itemY)
         itemY += 14
       }
     }
