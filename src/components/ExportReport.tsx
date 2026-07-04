@@ -172,84 +172,94 @@ async function generateDetailedPDF(results: InspectionResult[], batchStats: Batc
       pdf.text('No defects detected - this item passes quality inspection.', MARGIN, itemY + 6)
       itemY += 16
     } else {
-      for (const d of r.defects) {
+      for (let di = 0; di < r.defects.length; di++) {
+        const d = r.defects[di]
+        const tx = MARGIN + 8
+        const tw = INNER - 16
+        const LH = 3.65
+
         /* Page break check */
-        if (itemY + 80 > PAGE_H - MARGIN) {
+        if (itemY + 60 > PAGE_H - MARGIN - 10) {
           pdf.addPage()
           itemY = MARGIN
         }
 
-        pdf.setFillColor(...C_FILL)
-        pdf.roundedRect(MARGIN, itemY, INNER, 0, 3, 3, 'F')
-        pdf.setDrawColor(...C_BORDER)
-        pdf.roundedRect(MARGIN, itemY, INNER, 0, 3, 3, 'S')
+        /* Separator between defects */
+        if (di > 0) {
+          pdf.setDrawColor(...C_BORDER)
+          pdf.setLineWidth(0.3)
+          pdf.line(tx, itemY, PAGE_W - MARGIN - 8, itemY)
+          itemY += 5
+        }
 
-        let dy = itemY + 8
+        /* Header: accent bar + label + severity badge */
         pdf.setDrawColor(...C_ACCENT)
-        pdf.setLineWidth(0.8)
-        pdf.line(MARGIN + 6, dy - 3, MARGIN + 6, dy + 9)
+        pdf.setLineWidth(1.2)
+        pdf.line(MARGIN + 4, itemY, MARGIN + 4, itemY + 10)
 
         pdf.setFont('helvetica', 'bold')
         pdf.setFontSize(11)
         pdf.setTextColor(...C_TEXT)
-        pdf.text(`${d.label}`, MARGIN + 12, dy + 5)
+        pdf.text(`Defect #${di + 1}: ${d.label}`, MARGIN + 12, itemY + 7)
 
         const sevColor = statusColor(d.severity)
         pdf.setFillColor(...sevColor)
         pdf.setTextColor(255, 255, 255)
-        const sevW = pdf.getTextWidth(d.severity.toUpperCase()) + 10
-        pdf.roundedRect(PAGE_W - MARGIN - sevW, dy - 2, sevW, 10, 1.5, 1.5, 'F')
-        pdf.text(d.severity.toUpperCase(), PAGE_W - MARGIN - sevW / 2, dy + 5, { align: 'center' })
+        const sevLabel = d.severity.toUpperCase()
+        const sevW = pdf.getTextWidth(sevLabel) + 10
+        pdf.roundedRect(PAGE_W - MARGIN - sevW, itemY, sevW, 10, 1.5, 1.5, 'F')
+        pdf.text(sevLabel, PAGE_W - MARGIN - sevW / 2, itemY + 6, { align: 'center' })
 
-        dy += 16
-        const tw = INNER - 16
+        itemY += 16
 
-        const drawBlock = (title: string, text: string, color: [number, number, number]) => {
+        const addBlock = (label: string, text: string, color: [number, number, number]) => {
           pdf.setFont('helvetica', 'bold')
           pdf.setFontSize(8.5)
           pdf.setTextColor(...color)
-          pdf.text(title, MARGIN + 8, dy)
-          const lines = pdf.splitTextToSize(text, tw)
+          pdf.text(label, tx, itemY)
+          itemY += 4
+
           pdf.setFont('helvetica', 'normal')
           pdf.setFontSize(9)
           pdf.setTextColor(...C_TEXT)
-          pdf.text(lines, MARGIN + 8, dy + 5)
-          return lines.length * 4 + 9
+          const lines = pdf.splitTextToSize(text, tw)
+          pdf.text(lines, tx, itemY)
+          itemY += lines.length * LH + 3
         }
 
-        dy += drawBlock('Description', d.description, C_MUTED)
-        if (d.location) dy += drawBlock('Location', d.location, C_ACCENT) - 9
-        if (d.why) dy += drawBlock('Why this is a defect', d.why, C_ACCENT) - 9
-        if (d.impact) dy += drawBlock('Impact if not fixed', d.impact, C_REJECT) - 9
-        if (d.reworkInstructions) dy += drawBlock('How to fix', d.reworkInstructions, C_OK) - 9
+        addBlock('DESCRIPTION', d.description, C_MUTED)
+        if (d.location) addBlock('LOCATION', d.location, C_ACCENT)
+        if (d.why) addBlock('WHY THIS IS A DEFECT', d.why, C_ACCENT)
+        if (d.impact) addBlock('IMPACT IF NOT FIXED', d.impact, C_REJECT)
+        if (d.reworkInstructions) addBlock('HOW TO FIX', d.reworkInstructions, C_OK)
 
-        /* metrics row */
+        /* Metrics row */
+        const metricsY = itemY
         pdf.setDrawColor(...C_BORDER)
         pdf.setLineWidth(0.3)
-        pdf.line(MARGIN + 8, dy, PAGE_W - MARGIN - 8, dy)
-        dy += 6
+        pdf.line(tx, metricsY, PAGE_W - MARGIN - 8, metricsY)
+        itemY += 5
 
         pdf.setFont('helvetica', 'bold')
         pdf.setFontSize(8)
         pdf.setTextColor(...C_MUTED)
-        pdf.text('Confidence', MARGIN + 8, dy)
-        pdf.text('Severity', MARGIN + 70, dy)
-        pdf.text('Est. Cost', MARGIN + 120, dy)
-        pdf.text('Action', MARGIN + 160, dy)
-        dy += 5
+        pdf.text('Confidence', tx, itemY)
+        pdf.text('Severity', tx + 60, itemY)
+        pdf.text('Est. Cost', tx + 110, itemY)
+        pdf.text('Action', tx + 155, itemY)
+        itemY += 4
 
         pdf.setFont('helvetica', 'bold')
         pdf.setFontSize(9)
         pdf.setTextColor(...C_TEXT)
-        pdf.text(`${Math.round(d.confidence * 100)}%`, MARGIN + 8, dy)
-        pdf.text(d.severity.toUpperCase(), MARGIN + 70, dy)
+        pdf.text(`${Math.round(d.confidence * 100)}%`, tx, itemY)
+        pdf.text(d.severity.toUpperCase(), tx + 60, itemY)
         pdf.setTextColor(...C_WARN)
-        pdf.text(`Rs.${d.estimatedCostINR.min} - ${d.estimatedCostINR.max}`, MARGIN + 120, dy)
-        const actColor = d.recommendation === 'pass' ? C_OK : d.recommendation === 'rework' ? C_WARN : C_REJECT
-        pdf.setTextColor(...actColor)
-        pdf.text(d.recommendation.toUpperCase(), MARGIN + 160, dy)
-
-        itemY = dy + 12
+        pdf.text(`₹${d.estimatedCostINR.min}–${d.estimatedCostINR.max}`, tx + 110, itemY)
+        const actC = d.recommendation === 'pass' ? C_OK : d.recommendation === 'rework' ? C_WARN : C_REJECT
+        pdf.setTextColor(...actC)
+        pdf.text(d.recommendation.toUpperCase(), tx + 155, itemY)
+        itemY += 14
       }
     }
 
